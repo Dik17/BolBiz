@@ -48,7 +48,7 @@ export async function generateLaunchKit(spec, url, { client } = {}) {
  * Publishes the session's draft. Called ONLY from the /api/approve endpoint, which
  * requires the owner's click — the agent has no publish tool.
  */
-export async function publishDraft(session, baseUrl, deps = {}) {
+export async function publishDraft(session, baseUrl, deps = {}, plan = 'standard') {
   if (!session.awaitingApproval || !session.draftId) {
     const e = new Error('Nothing is awaiting approval');
     e.status = 409;
@@ -74,6 +74,7 @@ export async function publishDraft(session, baseUrl, deps = {}) {
   const record = {
     spec: { ...draft.spec, slug },
     audit: draft.audit,
+    plan,
     kit,
     qrSvg,
     ownerSession: session.id,
@@ -82,8 +83,8 @@ export async function publishDraft(session, baseUrl, deps = {}) {
   await sites.save(slug, record);
   session.awaitingApproval = false;
   session.publishedSlug = slug;
-  (session.pendingNotes ||= []).push(`[SYSTEM EVENT] The owner pressed Approve. The site is LIVE at ${url}. A QR poster and social captions were generated.`);
-  return { slug, url, kit, posterUrl: `/s/${slug}/poster` };
+  (session.pendingNotes ||= []).push(`[SYSTEM EVENT] The owner chose the ${plan} plan and pressed Approve. The site is LIVE at ${url}. A QR poster and social captions were generated.`);
+  return { slug, url, plan, kit, posterUrl: `/s/${slug}/poster` };
 }
 
 export async function translateForOwner(text, lang, { client } = {}) {

@@ -21,6 +21,16 @@ const contentSchema = {
         required: ['name'],
       },
     },
+    highlights: {
+      type: 'array',
+      description: 'Up to 3 short highlights drawn ONLY from what the owner said (e.g. "Made at home", "Free delivery in Kothrud"). Used by the Brand plan.',
+      items: { type: 'object', properties: { title: { type: 'string' }, text: { type: 'string' } }, required: ['title'] },
+    },
+    faqs: {
+      type: 'array',
+      description: 'Up to 3 common customer questions answered ONLY with facts the owner gave (ordering, delivery, timings). Used by the Brand plan.',
+      items: { type: 'object', properties: { q: { type: 'string' }, a: { type: 'string' } }, required: ['q', 'a'] },
+    },
     ui: {
       type: 'object',
       description: `Interface labels in this language. Keys: ${UI_KEYS.join(', ')}`,
@@ -75,7 +85,7 @@ export const TOOL_DEFS = [
   },
   {
     name: 'build_website',
-    description: 'Render a bilingual, accessible draft website from a structured spec and run the accessibility audit. Returns the preview URL, a 0-100 score and findings to fix. Does NOT publish.',
+    description: 'Render a bilingual, accessible draft website from a structured spec and run the accessibility audit. The owner will then see it as three mockups (Shuruaat free, Dukaan, Brand) and choose one. Returns the preview URL, a 0-100 score and findings to fix. Does NOT publish.',
     input_schema: {
       type: 'object',
       properties: {
@@ -98,7 +108,7 @@ export const TOOL_DEFS = [
   },
   {
     name: 'request_publish_approval',
-    description: 'Show the owner the preview with an Approve button. Only the owner can publish. Call only after build_website passed the audit.',
+    description: 'Show the owner the three plan mockups with prices and an Approve button. The owner picks the plan and publishes; you cannot. Call only after build_website passed the audit.',
     input_schema: {
       type: 'object',
       properties: {

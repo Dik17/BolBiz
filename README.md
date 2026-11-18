@@ -18,8 +18,9 @@ India has more than 60 million micro-businesses: home bakers, tailors, kirana st
 4. **Bilingual site generation.** The site is written in the owner's language and in English, with a WhatsApp button, a call button, hours, a menu and a working contact form.
 5. **Accessibility audit with self-correction.** Every build is checked for WCAG contrast, contactability, plain language, link purpose and language parity. The agent reads the findings and rebuilds until the site passes.
 6. **Human in control.** The agent *cannot* publish. Only the owner's **Approve** tap can, and the server enforces this.
-7. **Launch kit.** A printable QR poster for the shop counter, plus WhatsApp and Instagram captions in the owner's language.
-8. **Enquiries in your language.** When a customer writes in English through the site's form, the owner gets the message by email, translated into their language. Every enquiry is also saved, so no lead is lost.
+7. **Three plans, shown as real mockups.** After the build, the owner sees *their own* site in three designs side by side, each with its price: **Shuruaat** (free, one page), **Dukaan** (₹149/month: own GoDaddy domain, business email, contact form) and **Brand** (₹349/month: premium design, an order button on every item, highlights and FAQs). The owner picks one; the agent can't choose for them. Prices live in `src/site/plans.js`.
+8. **Launch kit.** A printable QR poster for the shop counter, plus WhatsApp and Instagram captions in the owner's language.
+9. **Enquiries in your language.** When a customer writes in English through the site's form, the owner gets the message by email, translated into their language. Every enquiry is also saved, so no lead is lost.
 
 ## How Claude and GoDaddy are used
 
@@ -52,8 +53,8 @@ Express ──► Agent loop (Sonnet + tools) ──► GoDaddy Domains API v3
 src/
   agent/    agent.js (tool loop, caching) · tools.js (schemas + handlers) · prompts.js
   services/ godaddy.js · launch.js (publish, launch kit, translation) · mailer.js · store.js (SQLite)
-  site/     schema.js (validation) · render.js (escaped template) · audit.js · contrast.js
-public/     index.html · app.js · styles.css · fonts/ (self-hosted Baloo 2, OFL)
+  site/     schema.js (validation) · render.js (3 plan templates, escaped) · plans.js (pricing) · audit.js · contrast.js
+public/     index.html · ui-core.js (shared UI) · app.js (API + voice) · styles.css · fonts/ (self-hosted Baloo 2, OFL)
 test/       unit tests + an end-to-end agent flow with a scripted Claude
 ```
 

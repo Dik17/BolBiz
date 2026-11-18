@@ -10,6 +10,7 @@ import { publishDraft, translateForOwner } from './services/launch.js';
 import { sendMail } from './services/mailer.js';
 import { renderSite, renderNotice, esc } from './site/render.js';
 import { LANGUAGES } from './site/schema.js';
+import { PLANS, PLAN_IDS } from './site/plans.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SPEECH_LANGS = new Set(Object.values(LANGUAGES).map((l) => l.speech));
@@ -46,7 +47,7 @@ export function createApp(deps = {}) {
   app.get('/healthz', (_req, res) => res.json({ ok: true }));
 
   app.get('/api/status', (_req, res) =>
-    res.json({ claude: isConfigured.claude(), godaddy: isConfigured.godaddy(), email: isConfigured.smtp(), languages: LANGUAGES }),
+    res.json({ claude: isConfigured.claude(), godaddy: isConfigured.godaddy(), email: isConfigured.smtp(), languages: LANGUAGES, plans: PLANS }),
   );
 
   // ---------- agent ----------
@@ -88,7 +89,9 @@ export function createApp(deps = {}) {
     const session = getSession(req.body?.sessionId);
     if (!session) return res.status(404).json({ error: 'Session expired.' });
     try {
-      const out = await publishDraft(session, baseUrl(req), deps);
+      const plan = PLAN_IDS.includes(req.body?.plan) ? req.body.plan : null;
+      if (!plan) return res.status(400).json({ error: 'Choose a plan first.' });
+      const out = await publishDraft(session, baseUrl(req), deps, plan);
       res.json(out);
     } catch (e) {
       res.status(e.status || 500).json({ error: e.status ? e.message : 'Could not publish.' });
@@ -104,7 +107,8 @@ export function createApp(deps = {}) {
     if (!ID.test(req.params.id)) return res.status(404).end();
     const d = await drafts.get(req.params.id);
     if (!d) return res.status(404).send(renderNotice('Not found', 'This preview does not exist.'));
-    res.set('X-Robots-Tag', 'noindex').send(renderSite(d.spec, { lang, mode: 'preview', basePath: `/preview/${req.params.id}` }));
+    const tier = PLAN_IDS.includes(req.query.plan) ? req.query.plan : 'standard';
+    res.set('X-Robots-Tag', 'noindex').send(renderSite(d.spec, { lang, tier, mode: 'preview', basePath: `/preview/${req.params.id}` }));
   };
   app.get('/preview/:id/', servePreview('primary'));
   app.get('/preview/:id/en', servePreview('en'));
@@ -116,11 +120,11 @@ export function createApp(deps = {}) {
   };
   app.get('/s/:slug/', async (req, res) => {
     const site = await loadSite(req, res);
-    if (site) res.send(renderSite(site.spec, { lang: 'primary', basePath: `/s/${site.spec.slug}` }));
+    if (site) res.send(renderSite(site.spec, { lang: 'primary', tier: site.plan, basePath: `/s/${site.spec.slug}` }));
   });
   app.get('/s/:slug/en', async (req, res) => {
     const site = await loadSite(req, res);
-    if (site) res.send(renderSite(site.spec, { lang: 'en', basePath: `/s/${site.spec.slug}` }));
+    if (site) res.send(renderSite(site.spec, { lang: 'en', tier: site.plan, basePath: `/s/${site.spec.slug}` }));
   });
   app.get('/s/:slug/poster', async (req, res) => {
     const site = await loadSite(req, res);
@@ -135,6 +139,7 @@ export function createApp(deps = {}) {
   app.post('/s/:slug/contact', limiter(5, 10), async (req, res) => {
     const site = await loadSite(req, res);
     if (!site) return;
+    if (site.plan === 'basic') return res.status(404).send(renderNotice('Not available', 'This page has no contact form. Please use WhatsApp or call.'));
     const { name, reply, message, website } = req.body || {};
     const back = `/s/${site.spec.slug}/`;
     const lang = site.spec.primary_lang;

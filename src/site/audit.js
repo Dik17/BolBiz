@@ -28,6 +28,9 @@ export function auditSpec(spec) {
   const langs = Object.entries(spec.content);
   const counts = new Set(langs.map(([, c]) => c.offerings.length));
   if (counts.size > 1) add('fail', 'parity', 'The two language versions list a different number of offerings; they must match item for item.');
+  for (const key of ['highlights', 'faqs']) {
+    if (new Set(langs.map(([, c]) => c[key].length)).size > 1) add('warn', `parity-${key}`, `The two language versions have a different number of ${key}.`);
+  }
 
   for (const [label, c] of langs) {
     c.offerings.forEach((o, i) => {

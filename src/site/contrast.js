@@ -36,3 +36,10 @@ export function darkenToContrast(hex, target = 4.5) {
 }
 
 const toHex = (r, g, b) => `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+
+/** Mix two colours: t=0 → a, t=1 → b. Used for soft brand tints. */
+export function mix(a, b, t) {
+  const A = hexToRgb(a);
+  const B = hexToRgb(b);
+  return toHex(...A.map((v, i) => Math.round(v + (B[i] - v) * t)));
+}

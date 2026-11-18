@@ -26,7 +26,12 @@ export const UI_KEYS = [
   'phone_label',
   'message_label',
   'send_label',
+  'order_label',
+  'faq_heading',
 ];
+
+// Labels every plan needs. order_label / faq_heading are only used by the Brand plan.
+export const REQUIRED_UI_KEYS = UI_KEYS.filter((k) => k !== 'order_label' && k !== 'faq_heading');
 
 export const EN_UI_DEFAULTS = {
   about_heading: 'About us',
@@ -40,6 +45,8 @@ export const EN_UI_DEFAULTS = {
   phone_label: 'Your phone or email',
   message_label: 'Your message',
   send_label: 'Send message',
+  order_label: 'Order this',
+  faq_heading: 'Common questions',
 };
 
 const HEX = /^#[0-9a-f]{6}$/i;
@@ -67,6 +74,14 @@ function cleanContent(c, isEnglish) {
     description: str(o?.description, 240),
     price: str(o?.price, 40),
   }));
+  const highlights = (Array.isArray(c.highlights) ? c.highlights : []).slice(0, 3).map((h) => ({
+    title: str(h?.title, 40),
+    text: str(h?.text, 140),
+  })).filter((h) => h.title);
+  const faqs = (Array.isArray(c.faqs) ? c.faqs : []).slice(0, 4).map((f) => ({
+    q: str(f?.q, 120),
+    a: str(f?.a, 300),
+  })).filter((f) => f.q && f.a);
   return {
     business_name: str(c.business_name, 80),
     tagline: str(c.tagline, 160),
@@ -74,6 +89,8 @@ function cleanContent(c, isEnglish) {
     hours: str(c.hours, 160),
     address: str(c.address, 240),
     offerings,
+    highlights,
+    faqs,
     ui,
   };
 }
@@ -116,7 +133,7 @@ export function normalizeSpec(raw) {
     if (c.offerings.length === 0) errors.push(`content.${label}.offerings needs at least one item`);
   }
   if (primary_lang !== 'en') {
-    const missing = UI_KEYS.filter((k) => !primary.ui[k]);
+    const missing = REQUIRED_UI_KEYS.filter((k) => !primary.ui[k]);
     if (missing.length) errors.push(`content.primary.ui is missing translations for: ${missing.join(', ')}`);
   }
 

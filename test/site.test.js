@@ -66,3 +66,18 @@ test('preview mode disables the contact form and blocks indexing', () => {
   assert.match(html, /noindex/);
   assert.match(html, /type="submit" disabled/);
 });
+
+test('renders all three plans with distinct features', () => {
+  const raw = sampleSpec();
+  raw.content.primary.highlights = [{ title: 'घरगुती', text: 'रोज ताजे' }];
+  raw.content.en.highlights = [{ title: 'Home made', text: 'Fresh every day' }];
+  const { spec } = normalizeSpec(raw);
+  const basic = renderSite(spec, { tier: 'basic' });
+  const standard = renderSite(spec, { tier: 'standard' });
+  const premium = renderSite(spec, { tier: 'premium', lang: 'en' });
+  assert.ok(!basic.includes('<form'), 'free plan has no contact form');
+  assert.ok(standard.includes('<form'));
+  assert.match(premium, /I%27d%20like%20to%20order|I'd like to order|like%20to%20order/);
+  assert.ok(premium.includes('Home made'));
+  for (const html of [basic, standard, premium]) assert.match(html, /<html lang="(mr|en)">/);
+});

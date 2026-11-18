@@ -77,7 +77,7 @@ test('full flow: voice turn → tools → self-fix → approval gate → publish
   const { sessionId } = await (await post('/api/session', { lang: 'mr-IN' })).json();
 
   // Approve must fail before the agent has asked for approval.
-  assert.equal((await post('/api/approve', { sessionId })).status, 409);
+  assert.equal((await post('/api/approve', { sessionId, plan: 'standard' })).status, 409);
 
   const res = await post('/api/agent', { sessionId, text: 'मी कोथरूडमध्ये घरी मोदक बनवते', lang: 'mr-IN' });
   const body = await res.text();
@@ -103,17 +103,19 @@ test('full flow: voice turn → tools → self-fix → approval gate → publish
   assert.equal((await realFetch(`${base}/s/aji-che-modak/`)).status, 404);
 
   // Owner approves → published, launch kit from Haiku, QR poster.
-  const ap = await post('/api/approve', { sessionId });
+  assert.equal((await post('/api/approve', { sessionId })).status, 400, 'plan is required');
+  const ap = await post('/api/approve', { sessionId, plan: 'premium' });
   assert.equal(ap.status, 200);
   const out = await ap.json();
   assert.equal(out.slug, 'aji-che-modak');
+  assert.equal(out.plan, 'premium');
   assert.equal(out.kit.poster_line, 'QR स्कॅन करा');
   const live = await (await realFetch(`${base}/s/aji-che-modak/`)).text();
   assert.match(live, /<html lang="mr">/);
   assert.match(await (await realFetch(`${base}/s/aji-che-modak/poster`)).text(), /<svg/);
 
   // Approval can't be replayed.
-  assert.equal((await post('/api/approve', { sessionId })).status, 409);
+  assert.equal((await post('/api/approve', { sessionId, plan: 'premium' })).status, 409);
 
   // Customer enquiry → stored, translated to Marathi, emailed.
   const form = new URLSearchParams({ name: 'Riya', reply: 'riya@example.com', message: 'Hi, I need 20 modaks', lang: 'en' });
