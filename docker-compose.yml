@@ -1,0 +1,32 @@
+# Production stack for the GoDaddy VPS: the app + Caddy (automatic HTTPS via Let's Encrypt).
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - TRUST_PROXY=1
+    volumes:
+      - bolbiz-data:/app/data        # SQLite database lives here
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [app]
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  bolbiz-data:
+  caddy-data:
+  caddy-config:

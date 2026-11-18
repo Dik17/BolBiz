@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BolBiz — say it, and your business is online</title>
+<meta name="description" content="Tell BolBiz about your business in your own language. It finds a domain on GoDaddy and builds an accessible website for you in minutes.">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23f2a516'/%3E%3Crect x='25' y='14' width='14' height='24' rx='7' fill='%2326337a'/%3E%3Cpath d='M19 32a13 13 0 0 0 26 0M32 45v6' stroke='%2326337a' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<script src="/app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#talk">Skip to the assistant</a>
+
+<header class="top">
+  <div class="shell top-row">
+    <a class="wordmark" href="/" aria-label="BolBiz home"><span class="wm-bol">Bol</span><span class="wm-biz">Biz</span></a>
+    <p class="top-line">Say it, and your business is online.</p>
+    <label class="readaloud"><input type="checkbox" id="readAloud" checked> Read replies aloud</label>
+  </div>
+</header>
+
+<main id="main">
+  <section class="stage shell" aria-labelledby="talkHeading">
+    <div class="talk" id="talk">
+      <fieldset class="langs">
+        <legend id="langLegend">Choose your language</legend>
+        <div class="lang-grid" id="langGrid"></div>
+      </fieldset>
+
+      <div class="mic-zone">
+        <button class="mic" id="micBtn" type="button" aria-pressed="false" aria-describedby="micHint">
+          <span class="mic-ring" aria-hidden="true"></span>
+          <svg class="mic-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="17" y="5" width="14" height="24" rx="7"/><path d="M10 23a14 14 0 0 0 28 0M24 37v7M16 44h16"/></svg>
+          <span class="sr-only" id="micLabel">Start speaking</span>
+        </button>
+        <h1 id="talkHeading" class="mic-prompt">Tap the mic and tell me about your business</h1>
+        <p id="micHint" class="mic-hint">For example: “I make cakes and modaks at home in Kothrud. People order on WhatsApp.”</p>
+      </div>
+
+      <div class="log" id="log" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation"></div>
+      <div class="quick" id="quick" aria-label="Quick answers"></div>
+
+      <form class="composer" id="composer" autocomplete="off">
+        <label for="textIn" class="sr-only">Type instead</label>
+        <input id="textIn" name="text" maxlength="2000" placeholder="Or type here…">
+        <button type="submit" class="send" id="sendBtn">Send</button>
+      </form>
+      <p class="activity" id="activity" role="status" aria-live="polite"></p>
+    </div>
+
+    <aside class="build" aria-label="Your website as it takes shape">
+      <ol class="journey" id="journey" aria-label="Progress">
+        <li data-step="listen">Listen</li>
+        <li data-step="profile">Understand</li>
+        <li data-step="domains">Find a domain</li>
+        <li data-step="build">Build the site</li>
+        <li data-step="audit">Accessibility check</li>
+        <li data-step="approve">Your approval</li>
+        <li data-step="live">Live</li>
+      </ol>
+
+      <div class="panel card-panel" id="profilePanel" hidden>
+        <h2>Business card</h2>
+        <dl id="profileList"></dl>
+      </div>
+
+      <div class="panel" id="domainPanel" hidden>
+        <h2>Domains on GoDaddy</h2>
+        <ul class="domains" id="domainList"></ul>
+        <p class="fine" id="domainSource"></p>
+      </div>
+
+      <div class="panel preview-panel" id="previewPanel" hidden>
+        <div class="preview-head">
+          <h2>Preview</h2>
+          <p class="score" id="score" aria-live="polite"></p>
+        </div>
+        <div class="frame"><iframe id="previewFrame" title="Preview of your website" loading="lazy"></iframe></div>
+        <p class="fine"><a id="previewLink" href="#" target="_blank" rel="noopener">Open the preview in a new tab</a></p>
+      </div>
+
+      <div class="panel approve-panel" id="approvePanel" hidden>
+        <h2>Ready to go live?</h2>
+        <p id="approveSummary"></p>
+        <p class="fine" id="approveDomain"></p>
+        <div class="row">
+          <button class="btn-approve" id="approveBtn" type="button">Approve and publish</button>
+          <button class="btn-quiet" id="changeBtn" type="button">I want changes</button>
+        </div>
+      </div>
+
+      <div class="panel live-panel" id="livePanel" hidden>
+        <h2>You are online</h2>
+        <p><a id="liveLink" href="#" target="_blank" rel="noopener"></a></p>
+        <div class="kit">
+          <div>
+            <h3>WhatsApp status</h3>
+            <p id="kitWa"></p>
+            <button class="btn-quiet copy" type="button" data-copy="kitWa">Copy</button>
+          </div>
+          <div>
+            <h3>Instagram caption</h3>
+            <p id="kitIg"></p>
+            <button class="btn-quiet copy" type="button" data-copy="kitIg">Copy</button>
+          </div>
+        </div>
+        <p><a class="btn-approve" id="posterLink" href="#" target="_blank" rel="noopener">Print the QR poster for your shop</a></p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="why shell" aria-labelledby="whyHeading">
+    <h2 id="whyHeading">Built for the people website builders forget</h2>
+    <div class="why-grid">
+      <div><h3>Your language, your voice</h3><p>Speak in Hindi, Marathi, Tamil, Telugu, Bengali, Gujarati, Kannada, Malayalam, Punjabi or English. No forms, no typing, no English needed.</p></div>
+      <div><h3>Accessible by default</h3><p>Every site is checked for contrast, plain language and clear labels, and the assistant fixes problems before you see them. Your customers with low vision can use it too.</p></div>
+      <div><h3>You stay in charge</h3><p>Nothing goes live until you press Approve. The assistant can suggest and build, but it cannot publish on its own.</p></div>
+      <div><h3>Real domains, real email</h3><p>Domain names and prices come live from GoDaddy. Customer messages reach your inbox, translated into your language.</p></div>
+    </div>
+  </section>
+
+  <section class="contact shell" aria-labelledby="contactHeading">
+    <h2 id="contactHeading">Talk to the BolBiz team</h2>
+    <p>Want BolBiz for your community, NGO or market association? Write to us.</p>
+    <form id="contactForm" novalidate>
+      <div class="hp" aria-hidden="true"><label for="cWebsite">Website</label><input id="cWebsite" name="website" tabindex="-1" autocomplete="off"></div>
+      <div><label for="cName">Your name</label><input id="cName" name="name" required maxlength="100" autocomplete="name"></div>
+      <div><label for="cEmail">Email</label><input id="cEmail" name="email" type="email" required maxlength="120" autocomplete="email"></div>
+      <div class="full"><label for="cMsg">Message</label><textarea id="cMsg" name="message" rows="4" required maxlength="2000"></textarea></div>
+      <div class="full"><button type="submit" class="btn-approve">Send message</button> <span id="contactStatus" role="status" aria-live="polite"></span></div>
+    </form>
+  </section>
+</main>
+
+<footer class="foot shell">
+  <p>BolBiz is built with Claude by Anthropic and runs on GoDaddy. Made for the GoDaddy Inclusive Innovation Hackathon 2026.</p>
+</footer>
+</body>
+</html>
