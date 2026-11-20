@@ -29,7 +29,7 @@ export async function generateLaunchKit(spec, url, { client } = {}) {
   try {
     const res = await (client || getClient()).messages.create({
       model: config.anthropic.fastModel,
-      max_tokens: 600,
+      max_tokens: 2048, // Haiku 5.5 thinks first; leave room for the answer
       messages: [{ role: 'user', content: LAUNCH_KIT_PROMPT(LANGUAGES[spec.primary_lang].name, c.business_name, url, c.tagline) }],
     });
     const j = parseJsonLoose(res.content.find((b) => b.type === 'text')?.text);
@@ -92,7 +92,7 @@ export async function translateForOwner(text, lang, { client } = {}) {
   try {
     const res = await (client || getClient()).messages.create({
       model: config.anthropic.fastModel,
-      max_tokens: 800,
+      max_tokens: 2048,
       system: TRANSLATE_PROMPT(LANGUAGES[lang].name),
       messages: [{ role: 'user', content: String(text).slice(0, 1500) }],
     });
