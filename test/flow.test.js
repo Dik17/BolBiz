@@ -73,6 +73,22 @@ test('GoDaddy check parses v3 prices (cents) and drops invalid domains', async (
   assert.deepEqual(r[0].price, { amount: 799, currency: 'INR', renewal: null });
 });
 
+test('falls back to RDAP when GoDaddy rejects the token', async () => {
+  const saved = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (String(url).includes('api.godaddy.com')) return new Response('{}', { status: 401 });
+    if (String(url).includes('rdap.org')) return new Response('', { status: 404 });
+    throw new Error('unexpected');
+  };
+  try {
+    const [r] = await checkDomains(['brandnewname.in']);
+    assert.equal(r.source, 'rdap');
+    assert.equal(r.available, true);
+  } finally {
+    globalThis.fetch = saved;
+  }
+});
+
 test('full flow: voice turn → tools → self-fix → approval gate → publish → enquiry', async () => {
   const { sessionId } = await (await post('/api/session', { lang: 'mr-IN' })).json();
 

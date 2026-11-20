@@ -50,6 +50,8 @@ async function rdapAvailable(domain, { fetchImpl = fetch } = {}) {
   return null; // unknown
 }
 
+let warned = false;
+
 /** Check a list of exact domains. Never throws; returns a status per domain. */
 export async function checkDomains(domains, opts = {}) {
   const unique = [...new Set(domains.map((d) => String(d).trim().toLowerCase()))].filter(isValidDomain).slice(0, 8);
@@ -71,6 +73,14 @@ export async function checkDomains(domains, opts = {}) {
         const available = await rdapAvailable(domain, opts);
         return { domain, available, definitive: false, price: null, source: 'rdap', buyUrl: buyUrl(domain) };
       } catch (e) {
+        if (useGoDaddy) {
+          // GoDaddy rejected the token or is unreachable: log it and fall back to the public registry.
+          if (!warned) { console.warn(`[godaddy] API error ${e.status || e.message}; falling back to RDAP`); warned = true; }
+          try {
+            const available = await rdapAvailable(domain, opts);
+            return { domain, available, definitive: false, price: null, source: 'rdap', buyUrl: buyUrl(domain) };
+          } catch { /* fall through */ }
+        }
         return { domain, available: null, error: e.status ? `lookup failed (${e.status})` : 'lookup failed', source: useGoDaddy ? 'godaddy' : 'rdap', buyUrl: buyUrl(domain) };
       }
     }),
