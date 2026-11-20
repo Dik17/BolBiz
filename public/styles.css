@@ -24,6 +24,8 @@
   --ease:cubic-bezier(.2,.8,.2,1);
 }
 *{box-sizing:border-box}
+:root{color-scheme:light}
+input,textarea,select{background-color:#fff;color:var(--ink)}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 [id]{scroll-margin-top:84px}
 body{margin:0;font:1.0625rem/1.6 var(--body);color:var(--ink);background:var(--paper);overflow-x:hidden}
