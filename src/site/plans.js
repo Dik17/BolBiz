@@ -7,7 +7,7 @@ export const PLANS = [
     meaning: 'The start',
     price: 0,
     priceNote: 'Free forever',
-    address: 'yourname.bolbiz.in',
+    address: 'bolbiz.in/s/yourname',
     features: [
       'One-page site in your language and English',
       'WhatsApp and call buttons',
